@@ -7,7 +7,7 @@ import (
 )
 
 var addr = flag.String("addr", ":8080", "http service address")
-var broadcast = flag.String("broadcast", "ws://ktuviot.kbb1.com:4000/ws", "broadcast service address")
+var broadcast = flag.String("broadcast", "wss://ktuviot.kbb1.com/ws/ws", "broadcast service address")
 
 type Message struct {
 	ID       uint   `json:"id"`
