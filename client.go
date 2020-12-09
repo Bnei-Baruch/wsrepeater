@@ -135,14 +135,12 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, knownMessages map
 	client.hub.register <- client
 
 	// Send known messages
-	for _, message := range knownMessages["questions"] {
-		msg, err := json.Marshal(message)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		client.send <- msg
+	msg, errMarshal := json.Marshal(knownMessages)
+	if errMarshal != nil {
+		log.Println(err)
+		return
 	}
+	client.send <- msg
 
 	// Allow collection of memory referenced by the caller by doing all work in new goroutines.
 	go client.writePump()
