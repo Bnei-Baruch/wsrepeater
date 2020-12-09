@@ -136,7 +136,6 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, knownMessages map
 
 	// Send known messages
 	msg, errMarshal := json.Marshal(knownMessages)
-	log.Print("Clear result", msg, err)
 	if errMarshal != nil {
 		log.Println(err)
 		return

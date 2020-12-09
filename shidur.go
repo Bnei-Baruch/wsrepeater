@@ -46,24 +46,8 @@ func serveShidur(hub *Hub, ws *recws.RecConn) {
 			}
 		} else {
 			// "New question" message was received
-			err = json.Unmarshal(msg, &knownMessages)
-			if err != nil {
-				log.Println("unmarshal err:", err)
-				continue
-			}
-			sendKnownMessages(hub, &knownMessages)
+			hub.broadcast <- msg
 		}
-	}
-}
-
-func sendKnownMessages(hub *Hub, knownMessages *map[string][]Message) {
-	for _, message := range (*knownMessages)["questions"] {
-		msg, err := json.Marshal(message)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		hub.broadcast <- msg
 	}
 }
 
