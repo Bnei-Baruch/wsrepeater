@@ -45,7 +45,7 @@ func serveShidur(hub *Hub, ws *recws.RecConn) {
 				delete(knownMessages, k)
 			}
 
-			clean, err := json.Marshal(map[string]bool{"clear": true})
+			clean, err := json.Marshal(map[string]bool{"question": true})
 			if err != nil {
 				return
 			}
