@@ -18,9 +18,7 @@ type Message struct {
 	Approved bool   `json:"approved"`
 }
 
-var knownMessages = map[string][]Message{
-	"questions": []Message{},
-}
+var knownMessages = map[string]Message{}
 
 func main() {
 	flag.Parse()
@@ -31,7 +29,7 @@ func main() {
 
 	http.HandleFunc("/", serveHome) // Debugging page
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(hub, w, r, knownMessages)
+		serveWs(hub, w, r)
 	})
 
 	log.Println("Serving", *addr)

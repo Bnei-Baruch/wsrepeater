@@ -42,22 +42,19 @@ func serveShidur(hub *Hub, ws *recws.RecConn) {
 			if message.Approved && message.Type == "question" {
 				// Single approved question
 				hub.broadcast <- msg
-				updateMessage(message)
+				knownMessages[message.Language] = message
 			}
 		} else {
 			// "New question" message was received
-			hub.broadcast <- msg
-		}
-	}
-}
+			for k := range knownMessages {
+				delete(knownMessages, k)
+			}
 
-func updateMessage(message Message) {
-	for idx, msg := range knownMessages["questions"] {
-		if message.Language == msg.Language {
-			knownMessages["questions"][idx] = message
-			break
+			clean, err := json.Marshal(map[string]bool{"clear": true})
+			if err != nil {
+				return
+			}
+			hub.broadcast <- clean
 		}
 	}
-	// not found
-	knownMessages["questions"] = append(knownMessages["questions"], message)
 }
