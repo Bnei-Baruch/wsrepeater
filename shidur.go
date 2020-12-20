@@ -31,7 +31,7 @@ func serveShidur(hub *Hub, ws *recws.RecConn) {
 			log.Println("read:", err)
 			return
 		}
-		log.Printf("recv: %s", msg)
+		log.Printf("--recv--: %s", msg)
 
 		if isMsg, message := unmarshalMsg(msg); isMsg {
 			if message.Approved && message.Type == "question" {
