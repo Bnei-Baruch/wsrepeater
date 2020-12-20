@@ -32,13 +32,14 @@ func serveShidur(hub *Hub, ws *recws.RecConn) {
 			return
 		}
 		log.Printf("recv: %s", msg)
-		var message Message
-		err = json.Unmarshal(msg, &message)
-		if err != nil {
-			log.Println("unmarshal err:", err)
-			continue
-		}
-		if message.Type != "" {
+
+		if !isCleanMsg(msg) {
+			var message Message
+			err = json.Unmarshal(msg, &message)
+			if err != nil {
+				log.Println("unmarshal err:", err)
+				continue
+			}
 			if message.Approved && message.Type == "question" {
 				// Single approved question
 				hub.broadcast <- msg
@@ -57,4 +58,18 @@ func serveShidur(hub *Hub, ws *recws.RecConn) {
 			hub.broadcast <- clean
 		}
 	}
+}
+
+func isCleanMsg(data []byte) bool {
+	var qs map[string][]Message
+	if err := json.Unmarshal(data, qs); err != nil {
+		return false
+	}
+
+	for _, q := range qs["questions"] {
+		if q.ID != 0 {
+			return false
+		}
+	}
+	return true
 }
