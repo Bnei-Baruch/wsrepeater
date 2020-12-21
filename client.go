@@ -136,14 +136,12 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 
 	// Send known messages
 	var questions []Message
-	log.Print("serveWs marshal questions knownMessages ", knownMessages)
 	for _, m := range knownMessages {
 		questions = append(questions, m)
 	}
 	var km = map[string][]Message{
 		"questions": questions,
 	}
-	log.Print("serveWs marshal questions km ", km)
 
 	msg, errMarshal := json.Marshal(km)
 	if errMarshal != nil {
