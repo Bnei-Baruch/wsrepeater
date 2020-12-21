@@ -11,7 +11,7 @@ var broadcast = flag.String("broadcast", "wss://ktuviot.kbb1.com/ws/ws", "broadc
 
 type Message struct {
 	ID       uint   `json:"id"`
-	Message  string `json:"message"`
+	Message  string `json:"message,required"`
 	UserName string `json:"user_name"`
 	Type     string `json:"type"`
 	Language string `json:"language"`

@@ -55,9 +55,14 @@ func serveShidur(hub *Hub, ws *recws.RecConn) {
 }
 
 func unmarshalMsg(data []byte) (bool, Message) {
-	var q Message
-	if err := json.Unmarshal(data, &q); err != nil || q.ID == 0 {
+	var qs map[string][]Message
+	if err := json.Unmarshal(data, &qs); err == nil {
 		return false, Message{}
+	}
+
+	var q Message
+	if err := json.Unmarshal(data, &q); err != nil {
+		log.Println("unmarshalMsg Unmarshal as Message error:", err)
 	}
 
 	return true, q
