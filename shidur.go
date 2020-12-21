@@ -32,48 +32,38 @@ func serveShidur(hub *Hub, ws *recws.RecConn) {
 			return
 		}
 		log.Printf("recv: %s", msg)
-		var message Message
-		err = json.Unmarshal(msg, &message)
-		if err != nil {
-			log.Println("unmarshal err:", err)
-			continue
-		}
-		if message.Type != "" {
+
+		if isMsg, message := unmarshalMsg(msg); isMsg {
 			if message.Approved && message.Type == "question" {
 				// Single approved question
 				hub.broadcast <- msg
-				updateMessage(message)
+				knownMessages[message.Language] = message
 			}
 		} else {
 			// "New question" message was received
-			err = json.Unmarshal(msg, &knownMessages)
-			if err != nil {
-				log.Println("unmarshal err:", err)
-				continue
+			for k := range knownMessages {
+				delete(knownMessages, k)
 			}
-			sendKnownMessages(hub, &knownMessages)
+
+			clean, err := json.Marshal(map[string]bool{"clear": true})
+			if err != nil {
+				return
+			}
+			hub.broadcast <- clean
 		}
 	}
 }
 
-func sendKnownMessages(hub *Hub, knownMessages *map[string][]Message) {
-	for _, message := range (*knownMessages)["questions"] {
-		msg, err := json.Marshal(message)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		hub.broadcast <- msg
+func unmarshalMsg(data []byte) (bool, Message) {
+	var qs map[string][]Message
+	if err := json.Unmarshal(data, &qs); err == nil {
+		return false, Message{}
 	}
-}
 
-func updateMessage(message Message) {
-	for idx, msg := range knownMessages["questions"] {
-		if message.Language == msg.Language {
-			knownMessages["questions"][idx] = message
-			break
-		}
+	var q Message
+	if err := json.Unmarshal(data, &q); err != nil {
+		log.Println("unmarshalMsg Unmarshal as Message error:", err)
 	}
-	// not found
-	knownMessages["questions"] = append(knownMessages["questions"], message)
+
+	return true, q
 }

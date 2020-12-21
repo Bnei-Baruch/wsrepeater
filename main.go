@@ -11,16 +11,14 @@ var broadcast = flag.String("broadcast", "wss://ktuviot.kbb1.com/ws/ws", "broadc
 
 type Message struct {
 	ID       uint   `json:"id"`
-	Message  string `json:"message"`
+	Message  string `json:"message,required"`
 	UserName string `json:"user_name"`
 	Type     string `json:"type"`
 	Language string `json:"language"`
 	Approved bool   `json:"approved"`
 }
 
-var knownMessages = map[string][]Message{
-	"questions": []Message{},
-}
+var knownMessages = map[string]Message{}
 
 func main() {
 	flag.Parse()
@@ -31,7 +29,7 @@ func main() {
 
 	http.HandleFunc("/", serveHome) // Debugging page
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(hub, w, r, knownMessages)
+		serveWs(hub, w, r)
 	})
 
 	log.Println("Serving", *addr)

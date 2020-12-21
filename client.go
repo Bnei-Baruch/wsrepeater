@@ -21,7 +21,7 @@ const (
 	pingPeriod = (pongWait * 9) / 10
 
 	// Maximum message size allowed from peer.
-	maxMessageSize = 512
+	maxMessageSize = 1024
 )
 
 var (
@@ -125,7 +125,7 @@ func (c *Client) writePump() {
 }
 
 // serveWs handles websocket requests from the peer.
-func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, knownMessages map[string][]Message) {
+func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -135,7 +135,15 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, knownMessages map
 	client.hub.register <- client
 
 	// Send known messages
-	msg, errMarshal := json.Marshal(knownMessages)
+	var questions []Message
+	for _, m := range knownMessages {
+		questions = append(questions, m)
+	}
+	var km = map[string][]Message{
+		"questions": questions,
+	}
+
+	msg, errMarshal := json.Marshal(km)
 	if errMarshal != nil {
 		log.Println(err)
 		return
