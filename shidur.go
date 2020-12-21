@@ -31,7 +31,7 @@ func serveShidur(hub *Hub, ws *recws.RecConn) {
 			log.Println("read:", err)
 			return
 		}
-		log.Printf("--recv--: %s", msg)
+		log.Printf("recv: %s", msg)
 
 		if isMsg, message := unmarshalMsg(msg); isMsg {
 			if message.Approved && message.Type == "question" {
@@ -57,10 +57,8 @@ func serveShidur(hub *Hub, ws *recws.RecConn) {
 func unmarshalMsg(data []byte) (bool, Message) {
 	var q Message
 	if err := json.Unmarshal(data, &q); err != nil || q.ID == 0 {
-		log.Printf("unmarshalMsg false %s, %s, %s", err, q.Message, q.Type)
 		return false, Message{}
 	}
 
-	log.Printf("unmarshalMsg true %s, %s", q.Message, q.Type)
 	return true, q
 }
